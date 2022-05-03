@@ -72,7 +72,7 @@ def parse_detections(args):
                 height = obj["relative_coordinates"]["height"] * img_height
                 bbox = np.array([(center_x - width / 2), (center_y - height / 2), (center_x + width / 2), (center_y + height / 2)])
                 draw_2D_box(img_cpy, bbox.to_numpy_array(), args.colors, args.classes.index(obj["name"]), bbox_message, show_label=True)
-        cv2.imwrite(args.save_dir + image_name, img_cpy)
+        cv2.imwrite(args.save_dir + os.path.sep + image_name, img_cpy)
 
     print("Done!")
 
