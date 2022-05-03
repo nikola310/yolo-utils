@@ -4,24 +4,6 @@ import random
 import cv2
 import numpy as np
 
-class BoundingBox:
-    """ Util class to present the 2d bounding dox of the object in one class by remembering two 
-        corners (upper left and bottom right) """
-
-    def __init__(self, xmin, ymin, xmax, ymax):
-        """ Constructor of the 2d bounding box class
-
-        Args:
-            xmin (float): x value of the upper left corner of 2d bounding box
-            ymin (float): y value of the upper left corner of 2d bounding box
-            xmax (float): x value of the bottom right corner of 2d bounding box
-            ymax (float): y value of the bottom right corner of 2d bounding box
-        """
-
-        self.xmin = xmin
-        self.ymin = ymin
-        self.xmax = xmax
-        self.ymax = ymax
 
 def draw_3D_box(image, corners):
     """ Drawing a 3D bounding box around the 3D detected object based on 8 corners that 

@@ -3,7 +3,7 @@ import json
 import os
 
 import cv2
-from draw_util BoundingBox, import draw_2D_box, init_colors
+from draw_util import draw_2D_box, init_colors
 
 
 def parse_args():
@@ -15,17 +15,17 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Neural network training',
                                     formatter_class = argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--json_file',
-                        default = "/home/machinecansee/Programming/darknet/result.json", type = str,
+                        default = "/home/darknet/result.json", type = str,
                         help = 'specify path to Darknet results json file')
     parser.add_argument('--save_dir',
-                        default = "output/real_photos/", type = str,
+                        default = "/home/output/real_photos/", type = str,
                         help = 'specify folder for saving images')
     parser.add_argument('--classes_file',
-                        default = "/home/machinecansee/Programming/mcs/dataset/new_dataset_yolo/vehicle_classes.txt", type = str,
+                        default = "/home/darknet/data/vehicle_classes.names", type = str,
                         help = 'specify path to file with class names')
     parser.add_argument('--confidence',
                         default = 0.0, type = float,
-                        help = 'set condfidence threshold')
+                        help = 'set condfidence threshold. Value from range [0, 1].')
     parsed_args = parser.parse_args()
     parsed_args.classes = read_txt_file(parsed_args.classes_file)
     parsed_args.colors = init_colors(len(parsed_args.classes))
@@ -43,6 +43,12 @@ def read_txt_file(filepath):
     return [line.strip() for line in open(filepath).readlines()]
 
 def parse_detections(args):
+    """Parse Yolo detections from results file.
+
+    Args:
+        args (obj): object with input arguments
+    """
+
     with open(args.json_file) as f:
         images_data = json.load(f)
 
@@ -57,14 +63,14 @@ def parse_detections(args):
         img_height, img_width, _ = img_og.shape
         object_list = image["objects"]
         for count, obj in enumerate(object_list):
-            if obj["confidence"]*100 >= args.confidence:
+            if obj["confidence"] >= args.confidence:
                 bbox_message = "%d. %s (%.2f)" % (count, obj["name"], obj["confidence"]*100)
                 center_x = obj["relative_coordinates"]["center_x"] * img_width
                 center_y = obj["relative_coordinates"]["center_y"] * img_height
             
                 width = obj["relative_coordinates"]["width"] * img_width
                 height = obj["relative_coordinates"]["height"] * img_height
-                bbox = BoundingBox((center_x - width / 2), (center_y - height / 2), (center_x + width / 2), (center_y + height / 2))
+                bbox = np.array([(center_x - width / 2), (center_y - height / 2), (center_x + width / 2), (center_y + height / 2)])
                 draw_2D_box(img_cpy, bbox.to_numpy_array(), args.colors, args.classes.index(obj["name"]), bbox_message, show_label=True)
         cv2.imwrite(args.save_dir + image_name, img_cpy)
 
